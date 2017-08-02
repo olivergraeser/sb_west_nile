@@ -3,3 +3,4 @@
 .ipynb_checkpoints/WVN-Keras-Example-checkpoint.ipynb
 .DS_Store
 *.csv
+*.pyc
