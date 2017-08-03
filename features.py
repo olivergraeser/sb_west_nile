@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from datetime import datetime
 from geopy.distance import great_circle
@@ -56,3 +57,27 @@ def get_nearest_trap(trap_distance_df, trap_id):
 
 def get_nearest_trap_list(trap_distance_df, trap_id):
     return trap_distance_df.loc[trap_id].sort_values(['distance'])
+
+def add_multirows(feature_df):
+    multirow = feature_df.groupby(['Trap', 'Species', 'Date']).count() 
+    multirow = multirow[['Address']]
+    multirow.columns = ['rowcount']
+    new_feature_df = pd.merge(left=feature_df, right=multirow, how='left', left_on=['Trap', 'Species', 'Date'], right_index=True)
+    return new_feature_df
+
+def add_basepop(feature_df):
+    param_dir = {2007: (89, 34, 4.0),
+             2008: (5, 35.5, 10),
+             2009: (4.62, 34, 17.0),
+             2010: (5, 32.4, 12.14),
+             2011: (10.01, 34, 24.0),
+             2012: (28, 32.6, 11.5),
+             2013: (36.1, 34, 17.0),
+             2014: (9, 35, 12.14)}
+    def baseline(row):
+        n, mu, sigma = param_dir[row['year']]
+        return n * np.exp(-np.square(row['week']-mu)/sigma)
+    return_df = feature_df.copy()
+    return_df['baseline'] = return_df.apply(baseline, axis=1)
+    return return_df
+    
