@@ -4,3 +4,6 @@
 .DS_Store
 *.csv
 *.pyc
+*.pickle
+*.pdf
+*.Rmd
